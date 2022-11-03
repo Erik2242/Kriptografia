@@ -1,11 +1,13 @@
 #!/usr/bin/env python3 -tt
+import numpy as np
+
 """
 File: crypto.py
 ---------------
 Assignment 1: Cryptography
 Course: CS 41
-Name: <YOUR NAME>
-SUNet: <SUNet ID>
+Name: Horvath Erik
+SUNet: heim1919
 
 Replace this with a description of the program.
 """
@@ -18,33 +20,179 @@ def encrypt_caesar(plaintext):
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
-
+    result = ""
+    for letter in plaintext:
+        result += chr((ord(letter) - 62) % 26 + 65)
+    return result
+    
 
 def decrypt_caesar(ciphertext):
     """Decrypt a ciphertext using a Caesar cipher.
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    result = ""
+    for letter in ciphertext:
+        result += chr((ord(letter) - 68) % 26 + 65)
+    return result
 
 
 # Vigenere Cipher
 
-def encrypt_vigenere(plaintext, keyword):
-    """Encrypt plaintext using a Vigenere cipher with a keyword.
+def set_keyword(plaintext, keyword):
+    final_keyword = ""
+    i = 0
+    for letter in plaintext:
+        if i == len(keyword):
+            i = 0
+        final_keyword = final_keyword + keyword[i]
+        i += 1
+    return final_keyword
 
-    Add more implementation details here.
-    """
-    raise NotImplementedError  # Your implementation here
+def encrypt_vigenere(plaintext, keyword):
+    keyword = set_keyword(plaintext, keyword)
+    result = ""
+    for i in range(len(plaintext)):
+        result += chr((ord(plaintext[i]) + ord(keyword[i]) - 130) % 26 + 65)
+    return result
 
 
 def decrypt_vigenere(ciphertext, keyword):
-    """Decrypt ciphertext using a Vigenere cipher with a keyword.
+    keyword = set_keyword(ciphertext, keyword)
+    result = ""
+    for i in range(len(ciphertext)):
+        result += chr((ord(ciphertext[i]) - ord(keyword[i]) - 130) % 26 + 65)
+    return result
 
-    Add more implementation details here.
-    """
-    raise NotImplementedError  # Your implementation here
+
+def encrypt_scytale(plaintext, n):
+    rows = n
+    columns = len(plaintext)
+    matrix = np.full((rows, columns), "")
+    i = 0
+    j = 0
+    for letter in plaintext:
+        if i == rows:
+            i = 0
+        matrix[i][j] = letter
+        i += 1
+        j += 1
+    result = ""
+    for i in range(rows):
+        for j in range(columns):
+            if matrix[i][j] != "":
+                result += matrix[i][j]
+    return result
+
+
+def make_scytale_matrix(matrix, rows, columns):
+    i = 0
+    j = 0
+    while j < columns:
+        if i == rows:
+            i = 0
+        matrix[i][j] = "*"
+        i += 1
+        j += 1
+    return matrix
+
+
+def decrypt_scytale(ciphertext, n):
+    rows = n
+    columns = len(ciphertext)
+    matrix = make_scytale_matrix(np.full((rows, columns), ""), rows, columns)
+    result = ""
+    k = 0
+    for i in range(rows):
+        for j in range(columns):
+            if matrix[i][j] == "*":
+                matrix[i][j] = ciphertext[k]
+                k += 1
+    result = ""
+    i = 0
+    j = 0
+    while j < columns:
+        if i == rows:
+            i = 0
+        result += matrix[i][j]
+        i += 1
+        j += 1
+    return result
+
+
+def encrypt_railfence(plaintext, n):
+    rows = n
+    columns = len(plaintext)
+    matrix = np.full((rows, columns), "")
+
+    i = 0
+    j = 0
+    increment = -1
+    for letter in plaintext:
+        if i == n - 1 or i == 0:
+            increment = increment * (-1)
+        matrix[i][j] = letter
+        i += increment
+        j += 1
+    result = ""
+    i = 0
+    j = 0
+    for i in range(rows):
+        for j in range(columns):
+            if matrix[i][j] != "":
+                result += matrix[i][j]
+    return result
+
+
+def make_zig_zag(matrix, rows, columns):
+    i = 0
+    j = 0
+    increment = -1
+    while j < columns:
+            if i == rows - 1 or i == 0:
+                increment = increment * (-1)
+            matrix[i][j] = "*"
+            i += increment
+            j += 1
+            
+    return matrix
+
+
+def decrypt_railfence(ciphertext, n):
+    rows = n
+    columns = len(ciphertext)
+    matrix = np.full((rows, columns), "")
+    matrix = make_zig_zag(matrix, rows, columns)
+    k = 0
+    for i in range(rows):
+        for j in range(columns):
+            if matrix[i][j] == "*":
+                matrix[i][j] = ciphertext[k]
+                k += 1
+    result = ""
+    i = 0
+    j = 0
+    increment = -1
+    while j < columns:
+        if i == n - 1 or i == 0:
+            increment = increment * (-1)
+        result += matrix[i][j]
+        i += increment
+        j += 1
+        
+    return result
+
+
+def main():
+    # print(encrypt_caesar("PYTHON"))
+    # print(decrypt_caesar("SBWKRQ"))
+    # print(encrypt_vigenere("ATTACKATDAWN", "LEMON"))
+    # print(decrypt_vigenere("LXFOPVEFRNHR", "LEMON"))
+    # print(encrypt_railfence("WEAREDISCOVEREDFLEEATONCE", 3))
+    # print(decrypt_railfence("WECRLTEERDSOEEFEAOCAIVDEN", 3))
+    print(encrypt_scytale("IAMHURTVERYBADLYHELP", 5))
+    print(decrypt_scytale("IRYYATBHMVAEHEDLURLP", 5))
+
 
 
 # Merkle-Hellman Knapsack Cryptosystem
@@ -128,3 +276,6 @@ def decrypt_mh(message, private_key):
     """
     raise NotImplementedError  # Your implementation here
 
+
+if __name__ == "__main__":
+    main()
