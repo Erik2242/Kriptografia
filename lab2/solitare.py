@@ -36,7 +36,7 @@ class Solitare():
             return None
         return self.deck[first_card]
 
-    def shuffle(self):
+    def generate_random_number(self):
         done = False
         while done is False:
             self.step_one()
